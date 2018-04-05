@@ -3,14 +3,14 @@ class Game
 	def initialize(game_name)
 		@game_name = game_name
 		@board = Board.new
-		@WK = King.new([4,0],"♚")
-		@WQ = Queen.new([3,0], "♛")
-		@WB1 = Bishop.new([2,0], "♝")
-		@WB2 = Bishop.new([5,0], "♝")
-		@WK1 = Knight.new([1,0], "♞")
-		@WK2 = Knight.new([6,0], "♞")
-		@WR1 = Rook.new([7,0], "♜")
-		@WR2 = Rook.new([0,0], "♜")
+		#@WK = King.new([4,0],"♚")
+		#@WQ = Queen.new([3,0], "♛")
+		#@WB1 = Bishop.new([2,0], "♝")
+		#@WB2 = Bishop.new([5,0], "♝")
+		#@WK1 = Knight.new([1,0], "♞")
+		#@WK2 = Knight.new([6,0], "♞")
+		#@WR1 = Rook.new([7,0], "♜")
+		#@WR2 = Rook.new([0,0], "♜")
 		@WP1 = Pawn.new([0,1], "♟")
 		@WP2 = Pawn.new([1,1], "♟")
 		@WP3 = Pawn.new([2,1], "♟")
@@ -19,22 +19,22 @@ class Game
 		@WP6 = Pawn.new([5,1], "♟")
 		@WP7 = Pawn.new([6,1], "♟")
 		@WP8 = Pawn.new([7,1], "♟")
-		@BK = King.new([4,7],"♔")
-		@BQ = Queen.new([3,7], "♕")
-		@BB1 = Bishop.new([2,7], "♗")
-		@BB2 = Bishop.new([5,7], "♗")
-		@BK1 = Knight.new([1,7], "♘")
-		@BK2 = Knight.new([6,7], "♘")
-		@BR1 = Rook.new([7,7], "♖")
-		@BR2 = Rook.new([0,7], "♖")
+		#@BK = King.new([4,7],"♔")
+		#@BQ = Queen.new([3,7], "♕")
+		#@BB1 = Bishop.new([2,7], "♗")
+		#@BB2 = Bishop.new([5,7], "♗")
+		#@BK1 = Knight.new([1,7], "♘")
+		#@BK2 = Knight.new([6,7], "♘")
+		#@BR1 = Rook.new([7,7], "♖")
+		#@BR2 = Rook.new([0,7], "♖")
 		@BP1 = Pawn.new([0,6], "♙")
-		@BP2 = Pawn.new([1,6], "♙")
-		@BP3 = Pawn.new([2,6], "♙")
-		@BP4 = Pawn.new([3,6], "♙")
-		@BP5 = Pawn.new([4,6], "♙")
-		@BP6 = Pawn.new([5,6], "♙")
-		@BP7 = Pawn.new([6,6], "♙")
-		@BP8 = Pawn.new([7,6], "♙")
+		#@BP2 = Pawn.new([1,6], "♙")
+		#@BP3 = Pawn.new([2,6], "♙")
+		#@BP4 = Pawn.new([3,6], "♙")
+		#@BP5 = Pawn.new([4,6], "♙")
+		#@BP6 = Pawn.new([5,6], "♙")
+		#@BP7 = Pawn.new([6,6], "♙")
+		#@BP8 = Pawn.new([7,6], "♙")
 		@all = [@WK, @WQ, @WB1, @WB2, @WK1, @WK2, @WR1, @WR2, @WP1, @WP2, @WP3, @WP4, @WP5, @WP6, @WP7, @WP8, @BK, @BQ, @BB1, @BB2, @BK1, @BK2, @BR1, @BR2, @BP1, @BP2, @BP3, @BP4, @BP5, @BP6, @BP7, @BP8]
 		@b_score = 0
 		@w_score = 0
@@ -75,8 +75,10 @@ class Game
 
 	def w_space_piece(x,y)
 		@all.each do |z|
-			if z.position == [x,y]
-				return z.color
+			unless z == nil
+				if z.position == [x,y]
+					return z.color
+				end
 			end
 		end
 		return "▒"
@@ -84,8 +86,10 @@ class Game
 
 	def b_space_piece(x,y)
 		@all.each do |z|
-			if z.position == [x,y]
-				return z.color
+			unless z == nil
+				if z.position == [x,y]
+					return z.color
+				end
 			end
 		end
 		return " "
@@ -93,8 +97,10 @@ class Game
 
 	def b_captured
 		@all.each do |z|
-			if z.position == [8,0]
-				return z.color
+			unless z == nil
+				if z.position == [8,0]
+					return z.color
+				end
 			end
 		end
 		return " "
@@ -102,8 +108,10 @@ class Game
 
 	def w_captured
 		@all.each do |z|
-			if z.position == [8,1]
-				return z.color
+			unless z == nil
+				if z.position == [8,1]
+					return z.color
+				end
 			end
 		end
 		return " "
@@ -130,7 +138,7 @@ class Game
 	end
 
 end
-#####################ALL CLASSES THAT ARE OUTSIDE GAME############################
+
 class Board
 	attr_accessor :coords
 	def initialize
@@ -140,51 +148,6 @@ class Board
 				$coords.push([i,j])
 			end
 		end
-	end
-end
-
-class King
-	attr_accessor :position, :color, :moves
-	def initialize(position, color, moves=[])
-		@position = position
-		@color = color
-		@moves = moves
-	end
-end
-
-class Queen
-	attr_accessor :position, :color, :moves
-	def initialize(position, color, moves=[])
-		@position = position
-		@color = color
-		@moves = moves
-	end
-end
-
-class Bishop
-	attr_accessor :position, :color, :moves
-	def initialize(position, color, moves=[])
-		@position = position
-		@color = color
-		@moves = moves
-	end
-end
-
-class Knight
-	attr_accessor :position, :color, :moves
-	def initialize(position, color, moves=[])
-		@position = position
-		@color = color
-		@moves = moves
-	end
-end
-
-class Rook
-	attr_accessor :position, :color, :moves
-	def initialize(position, color, moves=[])
-		@position = position
-		@color = color
-		@moves = moves
 	end
 end
 
@@ -209,5 +172,17 @@ class Pawn
 	end
 end
 
+
 game = Game.new("test")
+game.show_board
+game.all.each do |z|
+	unless z == nil
+		if z.color == "♟"
+			print z.moves
+			puts "\n"
+		end
+	end
+end
+game.move([1,1],[1,3])
+game.move([0,6],[0,4])
 game.show_board
