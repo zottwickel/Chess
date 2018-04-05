@@ -28,16 +28,16 @@ class Game
 		#@BR1 = Rook.new([7,7], "♖")
 		#@BR2 = Rook.new([0,7], "♖")
 		@BP1 = Pawn.new([0,6], "♙")
-		#@BP2 = Pawn.new([1,6], "♙")
-		#@BP3 = Pawn.new([2,6], "♙")
-		#@BP4 = Pawn.new([3,6], "♙")
-		#@BP5 = Pawn.new([4,6], "♙")
-		#@BP6 = Pawn.new([5,6], "♙")
-		#@BP7 = Pawn.new([6,6], "♙")
-		#@BP8 = Pawn.new([7,6], "♙")
-		@all = [@WK, @WQ, @WB1, @WB2, @WK1, @WK2, @WR1, @WR2, @WP1, @WP2, @WP3, @WP4, @WP5, @WP6, @WP7, @WP8, @BK, @BQ, @BB1, @BB2, @BK1, @BK2, @BR1, @BR2, @BP1, @BP2, @BP3, @BP4, @BP5, @BP6, @BP7, @BP8]
-		@b_score = 0
-		@w_score = 0
+		@BP2 = Pawn.new([1,6], "♙")
+		@BP3 = Pawn.new([2,6], "♙")
+		@BP4 = Pawn.new([3,6], "♙")
+		@BP5 = Pawn.new([4,6], "♙")
+		@BP6 = Pawn.new([5,6], "♙")
+		@BP7 = Pawn.new([6,6], "♙")
+		@BP8 = Pawn.new([7,6], "♙")
+		$all = [@WP1, @WP2, @WP3, @WP4, @WP5, @WP6, @WP7, @WP8, @BP1, @BP2, @BP3, @BP4, @BP5, @BP6, @BP7, @BP8]
+		$b_score = 0
+		$w_score = 0
 	end
 
 	def show_board
@@ -66,64 +66,60 @@ class Game
 	end
 
 	def b_score
-		@b_score
+		$b_score
 	end
 
 	def w_score
-		@w_score
+		$w_score
 	end
 
 	def w_space_piece(x,y)
-		@all.each do |z|
-			unless z == nil
-				if z.position == [x,y]
-					return z.color
-				end
+		$all.each do |z|
+			if z.position == [x,y]
+				return z.color
 			end
 		end
 		return "▒"
 	end
 
 	def b_space_piece(x,y)
-		@all.each do |z|
-			unless z == nil
-				if z.position == [x,y]
-					return z.color
-				end
+		$all.each do |z|
+			if z.position == [x,y]
+				return z.color
 			end
 		end
 		return " "
 	end
 
 	def b_captured
-		@all.each do |z|
-			unless z == nil
-				if z.position == [8,0]
-					return z.color
-				end
+		captured = Array.new
+		$all.each do |z|
+			if z.position == [8,0]
+				captured << z.color
 			end
 		end
-		return " "
+		return captured.join("")
 	end
 
 	def w_captured
-		@all.each do |z|
-			unless z == nil
-				if z.position == [8,1]
-					return z.color
-				end
+		captured = Array.new
+		$all.each do |z|
+			if z.position == [8,1]
+				captured << z.color
 			end
 		end
-		return " "
+		return captured.join("")
 	end
 
 	def move(start, destination)
-		if @all.any? {|x| start == x.position if x != nil}
-			@all.each do |z|
+		if  $all.any? {|x| start == x.position}
+			$all.each do |z|
 				unless z == nil
 					if start == z.position
 						if ($coords.include? destination) && (z.moves.include? destination)
-							z.position = destination
+							if piece_here?(destination)
+								piece(destination).capture
+							end
 							z.set_spot(destination)
 							puts "piece moved"
 						else
@@ -132,11 +128,30 @@ class Game
 					end
 				end
 			end
+			$all.each {|y| y.set_spot(y.position)}
 		else
 			puts "ERROR!!!! Your start position isn't a piece!"
 		end
 	end
 
+end
+
+def piece(loc)
+	if piece_here?(loc)
+		$all.each do |x|
+			if x.position == loc
+				return x
+			end if x != nil
+		end
+	end
+end
+
+def piece_here?(loc)
+	if $all.any? {|x| loc == x.position if x != nil}
+		return true
+	else
+		return false
+	end
 end
 
 class Board
@@ -162,12 +177,47 @@ class Pawn
 			@moves = [[position[0], (position[1] - 2)], [position[0], (position[1] - 1)]]
 		end
 	end
+
 	def set_spot(spot)
+		@moves = Array.new
 		@position = spot
+		if color == "♟"
+			if piece_here?([@position[0], (@position[1] + 1)]) == false
+				@moves << [@position[0], (@position[1] + 1)]
+				if @position[1] == 1 && piece_here?([@position[0], (@position[1] + 2)]) == false
+					@moves << [@position[0], (@position[1] + 2)]
+				end
+			end
+			if piece_here?([(@position[0] + 1), (@position[1] + 1)]) &&  (["♔", "♕", "♗", "♘", "♖", "♙"].include? piece([(@position[0] + 1), (@position[1] + 1)]).color)
+				@moves << [(@position[0] + 1), (@position[1] + 1)]
+			end
+			if piece_here?([(@position[0] - 1), (@position[1] + 1)]) && (["♔", "♕", "♗", "♘", "♖", "♙"].include? piece([(@position[0] - 1), (@position[1] + 1)]).color)
+				@moves << [(@position[0] - 1), (@position[1] + 1)]
+			end
+		elsif color == "♙" 
+			if piece_here?([@position[0], (@position[1] -1)]) == false
+				@moves << [@position[0], (@position[1] - 1)]
+				if @position[1] == 6 && piece_here?([@position[0], (@position[1] -2)]) == false
+					@moves << [@position[0], (@position[1] - 2)]
+				end
+			end
+			if piece_here?([(@position[0] + 1), (@position[1] - 1)]) &&  (["♚", "♛", "♝", "♞", "♜", "♟"].include? piece([(@position[0] + 1), (@position[1] - 1)]).color)
+				@moves << [(@position[0] + 1), (@position[1] - 1)]
+			end
+			if piece_here?([(@position[0] - 1), (@position[1] - 1)]) && (["♚", "♛", "♝", "♞", "♜", "♟"].include? piece([(@position[0] - 1), (@position[1] - 1)]).color)
+				@moves << [(@position[0] - 1), (@position[1] - 1)]
+			end
+		end
+		@moves
+	end
+
+	def capture
 		if @color == "♟"
-			@moves = [[spot[0], spot[1] + 1]]
+			@position = [8,0]
+			$b_score += 1
 		elsif @color == "♙"
-			@moves = [[spot[0], spot[1] - 1]]
+			@position = [8,1]
+			$w_score += 1
 		end
 	end
 end
@@ -175,14 +225,12 @@ end
 
 game = Game.new("test")
 game.show_board
-game.all.each do |z|
-	unless z == nil
-		if z.color == "♟"
-			print z.moves
-			puts "\n"
-		end
-	end
-end
 game.move([1,1],[1,3])
 game.move([0,6],[0,4])
+game.show_board
+game.move([1,6],[1,5])
+game.show_board
+game.move([1,3],[0,4])
+game.show_board
+game.move([0,4],[1,5])
 game.show_board
