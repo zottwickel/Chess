@@ -3,39 +3,9 @@ class Game
 	def initialize(game_name)
 		@game_name = game_name
 		@board = Board.new
-		@WK = King.new([4,0],"♚")
 		@WQ = Queen.new([3,0], "♛")
-		@WB1 = Bishop.new([2,0], "♝")
-		@WB2 = Bishop.new([5,0], "♝")
-		@WK1 = Knight.new([1,0], "♞")
-		@WK2 = Knight.new([6,0], "♞")
-		@WR1 = Rook.new([7,0], "♜")
-		@WR2 = Rook.new([0,0], "♜")
-		@WP1 = Pawn.new([0,1], "♟")
-		@WP2 = Pawn.new([1,1], "♟")
-		@WP3 = Pawn.new([2,1], "♟")
-		@WP4 = Pawn.new([3,1], "♟")
-		@WP5 = Pawn.new([4,1], "♟")
-		@WP6 = Pawn.new([5,1], "♟")
-		@WP7 = Pawn.new([6,1], "♟")
-		@WP8 = Pawn.new([7,1], "♟")
-		@BK = King.new([4,7],"♔")
 		@BQ = Queen.new([3,7], "♕")
-		@BB1 = Bishop.new([2,7], "♗")
-		@BB2 = Bishop.new([5,7], "♗")
-		@BK1 = Knight.new([1,7], "♘")
-		@BK2 = Knight.new([6,7], "♘")
-		@BR1 = Rook.new([7,7], "♖")
-		@BR2 = Rook.new([0,7], "♖")
-		@BP1 = Pawn.new([0,6], "♙")
-		@BP2 = Pawn.new([1,6], "♙")
-		@BP3 = Pawn.new([2,6], "♙")
-		@BP4 = Pawn.new([3,6], "♙")
-		@BP5 = Pawn.new([4,6], "♙")
-		@BP6 = Pawn.new([5,6], "♙")
-		@BP7 = Pawn.new([6,6], "♙")
-		@BP8 = Pawn.new([7,6], "♙")
-		$all = [@WK, @WQ, @WB1, @WB2, @WK1, @WK2, @WR1, @WR2, @WP1, @WP2, @WP3, @WP4, @WP5, @WP6, @WP7, @WP8, @BK, @BQ, @BB1, @BB2, @BK1, @BK2, @BR1, @BR2, @BP1, @BP2, @BP3, @BP4, @BP5, @BP6, @BP7, @BP8]
+		$all = [@WQ, @BQ]
 		$b_score = 0
 		$w_score = 0
 		#$all.each {|x| x.set_spot}
@@ -561,4 +531,7 @@ class Pawn
 end
 
 game = Game.new("test")
+game.show_board
+$all.each {|x| x.set_spot}
+game.move([3,0], [3,7])
 game.show_board
