@@ -710,3 +710,8 @@ class Pawn
 		end
 	end
 end
+
+game = Game.new("test")
+game.show_board
+game.move([3,6], [3,7])
+game.show_board
