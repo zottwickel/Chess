@@ -1,10 +1,40 @@
 class Game
-	attr_accessor :board, :WK, :WQ, :WB1, :WB2, :WK1, :WK2, :WR1, :WR2, :WP1, :WP2, :WP3, :WP4, :WP5, :WP6, :WP7, :WP8, :BK, :BQ, :BB1, :BB2, :BK1, :BK2, :BR1, :BR2, :BP1, :BP2, :BP3, :BP4, :BP5, :BP6, :BP7, :BP8, :b_score, :w_score, :all
 	def initialize(game_name)
 		@game_name = game_name
 		@board = Board.new
-		@WP = Pawn.new([3,6], "♟")
-		$all = [@WP]
+		@WK = King.new([4,0],"♚")
+		@WQ = Queen.new([3,0], "♛")
+		@WB1 = Bishop.new([2,0], "♝")
+		@WB2 = Bishop.new([5,0], "♝")
+		@WK1 = Knight.new([1,0], "♞")
+		@WK2 = Knight.new([6,0], "♞")
+		@WR1 = Rook.new([7,0], "♜")
+		@WR2 = Rook.new([0,0], "♜")
+		@WP1 = Pawn.new([0,1], "♟")
+		@WP2 = Pawn.new([1,1], "♟")
+		@WP3 = Pawn.new([2,1], "♟")
+		@WP4 = Pawn.new([3,1], "♟")
+		@WP5 = Pawn.new([4,1], "♟")
+		@WP6 = Pawn.new([5,1], "♟")
+		@WP7 = Pawn.new([6,1], "♟")
+		@WP8 = Pawn.new([7,1], "♟")
+		@BK = King.new([4,7],"♔")
+		@BQ = Queen.new([3,7], "♕")
+		@BB1 = Bishop.new([2,7], "♗")
+		@BB2 = Bishop.new([5,7], "♗")
+		@BK1 = Knight.new([1,7], "♘")
+		@BK2 = Knight.new([6,7], "♘")
+		@BR1 = Rook.new([7,7], "♖")
+		@BR2 = Rook.new([0,7], "♖")
+		@BP1 = Pawn.new([0,6], "♙")
+		@BP2 = Pawn.new([1,6], "♙")
+		@BP3 = Pawn.new([2,6], "♙")
+		@BP4 = Pawn.new([3,6], "♙")
+		@BP5 = Pawn.new([4,6], "♙")
+		@BP6 = Pawn.new([5,6], "♙")
+		@BP7 = Pawn.new([6,6], "♙")
+		@BP8 = Pawn.new([7,6], "♙")
+		$all = [@WK, @WQ, @WB1, @WB2, @WK1, @WK2, @WR1, @WR2, @WP1, @WP2, @WP3, @WP4, @WP5, @WP6, @WP7, @WP8, @BK, @BQ, @BB1, @BB2, @BK1, @BK2, @BR1, @BR2, @BP1, @BP2, @BP3, @BP4, @BP5, @BP6, @BP7, @BP8]
 		$b_score = 0
 		$w_score = 0
 		$all.each {|x| x.set_spot}
@@ -82,31 +112,104 @@ class Game
 	end
 
 	def move(start, destination)
-		if (piece(start).color == "♔") && b_king_danger?(destination)
-			puts "ERROR!!! The king would be in danger there!"
-		elsif (piece(start).color == "♚") && w_king_danger?(destination)
-			puts "ERROR!!! The king would be in danger there!"
-		else
-			if  $all.any? {|x| start == x.position}
-				$all.each do |z|
-					if start == z.position
-						if ($coords.include? destination) && (z.moves.include? destination)
-							if piece_here?(destination)
-								piece(destination).capture
-							end
-							z.set_spot(destination)
-							puts "piece moved"
-						else
-							puts "ERROR!!!! your destination isn't valid!"
+		if  piece(start).moves.include? desitination
+			if $coords.include? destination
+				if ["♔", "♕", "♗", "♘", "♖", "♙"].include? piece(start).color
+					piece(start).position = [8, 2]
+					$all.each {|x| x.set_spot}
+					if b_check?
+						piece([8, 2]).position = start
+						$all.each {|x| x.set_spot}
+						puts "ERROR!!!! This would put your king in check!!!"
+					else
+						if piece_here?(destination)
+							piece(destination).capture
 						end
+						piece([8, 2]).position = destination
+						$all.each {|x| x.set_spot}
+						puts "piece moved"
+					end
+				elsif ["♚", "♛", "♝", "♞", "♜", "♟"].include? piece(start).color
+					piece(start).position = [8, 2]
+					$all.each {|x| x.set_spot}
+					if w_check?
+						piece([8, 2]).position = start
+						$all.each {|x| x.set_spot}
+						puts "ERROR!!!! This would put your king in check!!!"
+					else
+						if piece_here?(destination)
+							piece(destination).capture
+						end
+						piece([8, 2]).position = destination
+						$all.each {|x| x.set_spot}
+						puts "piece moved"
 					end
 				end
 			else
-				puts "ERROR!!!! Your start position isn't a piece!"
+				puts "ERROR!!!! your destination isn't valid!"
 			end
+		else
+			puts "ERROR!!!! Your start position isn't a valid!"
 		end
 	end
 
+	def w_check?
+		if $all.any? {|x| (x.moves.include? @WK.position) && (["♔", "♕", "♗", "♘", "♖", "♙"].include? x.color)}
+			return true
+		else
+			return false
+		end
+	end
+
+	def b_check?
+		if $all.any? {|x| (x.moves.include? @BK.position) && (["♚", "♛", "♝", "♞", "♜", "♟"].include? x.color)}
+			return true
+		else
+			return false
+		end
+	end
+
+	def checkmate?
+		statement = true
+		if w_check? == true
+			$all.each do |x|
+				if ["♚", "♛", "♝", "♞", "♜", "♟"].include? x.color
+					starting = x.position
+					x.moves.each do |y|
+						x.position = y
+						$all.each {|z| z.set_spot}
+						if w_check? == false
+							x.position = starting
+							statement = false
+						end
+						x.position = starting
+						$all.each {|z| z.set_spot}
+					end
+				end
+			end
+			return statement
+		elsif b_check? == true
+			$all.each do |x|
+				if ["♔", "♕", "♗", "♘", "♖", "♙"].include? x.color
+					starting = x.position
+					x.moves.each do |y|
+						x.position = y
+						$all.each {|z| z.set_spot}
+						if b_check? == false
+							x.position = starting
+							statement = false
+						end
+						x.position = starting
+						$all.each {|z| z.set_spot}
+					end
+				end
+			end
+			return statement
+		else
+			statement = false
+			return statement
+		end
+	end
 end
 #####################ALL METHODS OUTSIDE GAME######################################
 def piece(loc)
@@ -114,49 +217,21 @@ def piece(loc)
 		$all.each do |x|
 			if x.position == loc
 				return x
-			end if x != nil
-		end
-	end
-end
-
-def w_king_danger?(loc)
-	w_king = King.new(loc, "♚")
-	$all.each do |z|
-		z.set_spot
-		if (z.moves.include? w_king.position)
-			w_king = nil
-			z.set_spot
-			return true
-		else
-			w_king = nil
-			z.set_spot
-			return false
-		end
-	end
-end
-
-def b_king_danger?(loc)
-	b_king = King.new(loc, "♔")
-	$all.each do |z|
-		z.set_spot
-		if (z.moves.include? b_king.position)
-			b_king = nil
-			z.set_spot
-			return true
-		else
-			b_king = nil
-			return false
+			end
 		end
 	end
 end
 
 def piece_here?(loc)
-	if $all.any? {|x| loc == x.position if x != nil}
+	if $all.any? {|x| loc == x.position}
 		return true
 	else
 		return false
 	end
 end
+
+
+
 #####################ALL CLASSES THAT ARE OUTSIDE GAME############################
 class Board
 	attr_accessor :coords
@@ -195,6 +270,9 @@ class King
 			else
 				@moves << y
 			end
+		end
+		if ($all.count {|z| z.position == spot}) >= 2
+			@moves.clear
 		end
 	end
 end
@@ -322,6 +400,9 @@ class Queen
 			end
 			@moves << [(@position[0] - q), (@position[1] + q)]
 		end
+		if ($all.count {|z| z.position == spot}) >= 2
+			@moves.clear
+		end
 	end
 	def capture
 		if @color == "♛"
@@ -401,6 +482,9 @@ class Bishop
 			end
 			@moves << [(@position[0] - l), (@position[1] + l)]
 		end
+		if ($all.count {|z| z.position == spot}) >= 2
+			@moves.clear
+		end
 	end
 	def capture
 		if @color == "♝"
@@ -438,6 +522,9 @@ class Knight
 			else
 				@moves << y
 			end
+		end
+		if ($all.count {|z| z.position == spot}) >= 2
+			@moves.clear
 		end
 	end
 	def capture
@@ -516,6 +603,9 @@ class Rook
 				break
 			end
 			@moves << [(@position[0] - l), @position[1]]
+		end
+		if ($all.count {|z| z.position == spot}) >= 2
+			@moves.clear
 		end
 	end
 	def capture
@@ -692,6 +782,9 @@ class Pawn
 				@moves << [(@position[0] - q), (@position[1] + q)]
 			end
 		end
+		if ($all.count {|z| z.position == spot}) >= 2
+			@moves.clear
+		end
 	end
 	def capture
 		if @color == "♟"
@@ -710,3 +803,6 @@ class Pawn
 		end
 	end
 end
+
+game = Game.new("test")
+game.show_board

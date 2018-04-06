@@ -1,6 +1,5 @@
 class Game
-	attr_accessor :board, :WK, :WQ, :WB1, :WB2, :WK1, :WK2, :WR1, :WR2, :WP1, :WP2, :WP3, :WP4, :WP5, :WP6, :WP7, :WP8, :BK, :BQ, :BB1, :BB2, :BK1, :BK2, :BR1, :BR2, :BP1, :BP2, :BP3, :BP4, :BP5, :BP6, :BP7, :BP8, :b_score, :w_score, :all
-	def initialize(game_name)
+		def initialize(game_name)
 		@game_name = game_name
 		@board = Board.new
 		@WK = King.new([4,0],"♚")
@@ -36,11 +35,9 @@ class Game
 		@BP7 = Pawn.new([6,6], "♙")
 		@BP8 = Pawn.new([7,6], "♙")
 		$all = [@WK, @WQ, @WB1, @WB2, @WK1, @WK2, @WR1, @WR2, @WP1, @WP2, @WP3, @WP4, @WP5, @WP6, @WP7, @WP8, @BK, @BQ, @BB1, @BB2, @BK1, @BK2, @BR1, @BR2, @BP1, @BP2, @BP3, @BP4, @BP5, @BP6, @BP7, @BP8]
-		$w_pawns = [@WP1, @WP2, @WP3, @WP4, @WP5, @WP6, @WP7, @WP8]
-		$b_pawns = [@BP1, @BP2, @BP3, @BP4, @BP5, @BP6, @BP7, @BP8]
 		$b_score = 0
 		$w_score = 0
-		#$all.each {|x| x.set_spot}
+		$all.each {|x| x.set_spot}
 	end
 
 	def show_board
@@ -115,37 +112,104 @@ class Game
 	end
 
 	def move(start, destination)
-		if  $all.any? {|x| start == x.position}
-			$all.each do |z|
-				unless z == nil
-					if start == z.position
-						if ($coords.include? destination) && (z.moves.include? destination)
-							if piece_here?(destination)
-								piece(destination).capture
-							end
-							z.set_spot(destination)
-							puts "piece moved"
-						else
-							puts "ERROR!!!! your destination isn't valid!"
+		if  piece(start).moves.include? desitination
+			if $coords.include? destination
+				if ["♔", "♕", "♗", "♘", "♖", "♙"].include? piece(start).color
+					piece(start).position = [8, 2]
+					$all.each {|x| x.set_spot}
+					if b_check?
+						piece([8, 2]).position = start
+						$all.each {|x| x.set_spot}
+						puts "ERROR!!!! This would put your king in check!!!"
+					else
+						if piece_here?(destination)
+							piece(destination).capture
 						end
+						piece([8, 2]).position = destination
+						$all.each {|x| x.set_spot}
+						puts "piece moved"
+					end
+				elsif ["♚", "♛", "♝", "♞", "♜", "♟"].include? piece(start).color
+					piece(start).position = [8, 2]
+					$all.each {|x| x.set_spot}
+					if w_check?
+						piece([8, 2]).position = start
+						$all.each {|x| x.set_spot}
+						puts "ERROR!!!! This would put your king in check!!!"
+					else
+						if piece_here?(destination)
+							piece(destination).capture
+						end
+						piece([8, 2]).position = destination
+						$all.each {|x| x.set_spot}
+						puts "piece moved"
 					end
 				end
-			end
-			$all.each {|y| y.set_spot}
-			$all.each do |a|
-				if (a.color == "♟") && (a.position[1] == 7)
-					a = Queen.new(a.position, "♛")
-					a.set_spot
-				elsif (a.color == "♙") && (a.position[1] == 0)
-					a = Queen.new(a.position, "♕")
-					a.set_spot
-				end
+			else
+				puts "ERROR!!!! your destination isn't valid!"
 			end
 		else
-			puts "ERROR!!!! Your start position isn't a piece!"
+			puts "ERROR!!!! Your start position isn't a valid!"
 		end
 	end
 
+	def w_check?
+		if $all.any? {|x| (x.moves.include? @WK.position) && (["♔", "♕", "♗", "♘", "♖", "♙"].include? x.color)}
+			return true
+		else
+			return false
+		end
+	end
+
+	def b_check?
+		if $all.any? {|x| (x.moves.include? @BK.position) && (["♚", "♛", "♝", "♞", "♜", "♟"].include? x.color)}
+			return true
+		else
+			return false
+		end
+	end
+
+	def checkmate?
+		statement = true
+		if w_check? == true
+			$all.each do |x|
+				if ["♚", "♛", "♝", "♞", "♜", "♟"].include? x.color
+					starting = x.position
+					x.moves.each do |y|
+						x.position = y
+						$all.each {|z| z.set_spot}
+						if w_check? == false
+							x.position = starting
+							statement = false
+						end
+						x.position = starting
+						$all.each {|z| z.set_spot}
+					end
+				end
+			end
+			return statement
+		elsif b_check? == true
+			$all.each do |x|
+				if ["♔", "♕", "♗", "♘", "♖", "♙"].include? x.color
+					starting = x.position
+					x.moves.each do |y|
+						x.position = y
+						$all.each {|z| z.set_spot}
+						if b_check? == false
+							x.position = starting
+							statement = false
+						end
+						x.position = starting
+						$all.each {|z| z.set_spot}
+					end
+				end
+			end
+			return statement
+		else
+			statement = false
+			return statement
+		end
+	end
 end
 #####################ALL METHODS OUTSIDE GAME######################################
 def piece(loc)
@@ -153,18 +217,21 @@ def piece(loc)
 		$all.each do |x|
 			if x.position == loc
 				return x
-			end if x != nil
+			end
 		end
 	end
 end
 
 def piece_here?(loc)
-	if $all.any? {|x| loc == x.position if x != nil}
+	if $all.any? {|x| loc == x.position}
 		return true
 	else
 		return false
 	end
 end
+
+
+
 #####################ALL CLASSES THAT ARE OUTSIDE GAME############################
 class Board
 	attr_accessor :coords
@@ -194,7 +261,7 @@ class King
 			all_on_board << x if ($coords.include? x)
 		end
 		all_on_board.each do |y|
-			if piece_here?(y)
+			if piece_here?(y) == true
 				if @color == "♔"
 					@moves << y if (["♚", "♛", "♝", "♞", "♜", "♟"].include? piece(y).color)
 				elsif @color == "♚"
@@ -203,6 +270,9 @@ class King
 			else
 				@moves << y
 			end
+		end
+		if ($all.count {|z| z.position == spot}) >= 2
+			@moves.clear
 		end
 	end
 end
@@ -330,6 +400,9 @@ class Queen
 			end
 			@moves << [(@position[0] - q), (@position[1] + q)]
 		end
+		if ($all.count {|z| z.position == spot}) >= 2
+			@moves.clear
+		end
 	end
 	def capture
 		if @color == "♛"
@@ -409,6 +482,9 @@ class Bishop
 			end
 			@moves << [(@position[0] - l), (@position[1] + l)]
 		end
+		if ($all.count {|z| z.position == spot}) >= 2
+			@moves.clear
+		end
 	end
 	def capture
 		if @color == "♝"
@@ -446,6 +522,9 @@ class Knight
 			else
 				@moves << y
 			end
+		end
+		if ($all.count {|z| z.position == spot}) >= 2
+			@moves.clear
 		end
 	end
 	def capture
@@ -525,6 +604,9 @@ class Rook
 			end
 			@moves << [(@position[0] - l), @position[1]]
 		end
+		if ($all.count {|z| z.position == spot}) >= 2
+			@moves.clear
+		end
 	end
 	def capture
 		if @color == "♜"
@@ -551,6 +633,12 @@ class Pawn
 	def set_spot(spot=@position)
 		@moves = Array.new
 		@position = spot
+		if @position[1] == 7
+			@color = "♛"
+		end
+		if @position[1] == 0
+			@color = "♕"
+		end
 		if @color == "♟"
 			if piece_here?([@position[0], (@position[1] + 1)]) == false
 				@moves << [@position[0], (@position[1] + 1)]
@@ -578,6 +666,125 @@ class Pawn
 				@moves << [(@position[0] - 1), (@position[1] - 1)]
 			end
 		end
+		#########This code will only engage as a result of pawn promotion#########
+		if (@color == "♕") || (@color == "♛")
+			#UP
+			for i in 1..7
+				if piece_here?([@position[0], (@position[1] + i)])
+					if (@color == "♕") && (["♚", "♛", "♝", "♞", "♜", "♟"].include? piece([@position[0], (@position[1] + i)]).color)
+						@moves << [@position[0], (@position[1] + i)]
+					elsif (@color == "♛") && (["♔", "♕", "♗", "♘", "♖", "♙"].include? piece([@position[0], (@position[1] + i)]).color)
+						@moves << [@position[0], (@position[1] + i)]
+					end
+					break
+				elsif (($coords.include? [@position[0], (@position[1] + i)]) == false)
+					break
+				end
+				@moves << [@position[0], (@position[1] + i)]
+			end
+			#RIGHT-UP
+			for j in 1..7
+				if piece_here?([@position[0] + j, (@position[1] + j)])
+					if (@color == "♕") && (["♚", "♛", "♝", "♞", "♜", "♟"].include? piece([@position[0] + j, (@position[1] + j)]).color)
+						@moves << [@position[0] + j, (@position[1] + j)]
+					elsif (@color == "♛") && (["♔", "♕", "♗", "♘", "♖", "♙"].include? piece([@position[0] + j, (@position[1] + j)]).color)
+						@moves << [@position[0] + j, (@position[1] + j)]
+					end
+					break
+				elsif (($coords.include? [@position[0] + j, (@position[1] + j)]) == false)
+					break
+				end
+				@moves << [@position[0] + j, (@position[1] + j)]
+			end
+			#RIGHT
+			for k in 1..7
+				if piece_here?([(@position[0] + k), @position[1]])
+					if (@color == "♕") && (["♚", "♛", "♝", "♞", "♜", "♟"].include? piece([(@position[0] + k), @position[1]]).color)
+						@moves << [(@position[0] + k), @position[1]]
+					elsif (@color == "♛") && (["♔", "♕", "♗", "♘", "♖", "♙"].include? piece([(@position[0] + k), @position[1]]).color)
+						@moves << [(@position[0] + k), @position[1]]
+					end
+					break
+				elsif (($coords.include? [(@position[0] + k), @position[1]]) == false)
+					break
+				end
+				@moves << [(@position[0] + k), @position[1]]
+			end
+			#RIGHT-DOWN
+			for l in 1..7
+				if piece_here?([@position[0] + l, (@position[1] - l)])
+					if (@color == "♕") && (["♚", "♛", "♝", "♞", "♜", "♟"].include? piece([@position[0] + l, (@position[1] - l)]).color)
+						@moves << [@position[0] + l, (@position[1] - l)]
+					elsif (@color == "♛") && (["♔", "♕", "♗", "♘", "♖", "♙"].include? piece([@position[0] + l, (@position[1] - l)]).color)
+						@moves << [@position[0] + l, (@position[1] - l)]
+					end
+					break
+				elsif (($coords.include? [@position[0] + l, (@position[1] - l)]) == false)
+					break
+				end
+				@moves << [@position[0] + l, (@position[1] - l)]
+			end
+			#DOWN
+			for m in 1..7
+				if piece_here?([@position[0], (@position[1] - m)])
+					if (@color == "♕") && (["♚", "♛", "♝", "♞", "♜", "♟"].include? piece([@position[0], (@position[1] - m)]).color)
+						@moves << [@position[0], (@position[1] - m)]
+					elsif (@color == "♛") && (["♔", "♕", "♗", "♘", "♖", "♙"].include? piece([@position[0], (@position[1] - m)]).color)
+						@moves << [@position[0], (@position[1] - m)]
+					end
+					break
+				elsif (($coords.include? [@position[0], (@position[1] - m)]) == false)
+					break
+				end
+				@moves << [@position[0], (@position[1] - m)]
+			end
+			#LEFT-DOWN
+			for n in 1..7
+				if piece_here?([(@position[0] - n), @position[1] - n])
+					if (@color == "♕") && (["♚", "♛", "♝", "♞", "♜", "♟"].include? piece([(@position[0] - n), @position[1] - n]).color)
+						@moves << [(@position[0] - n), @position[1] - n]
+					elsif (@color == "♛") && (["♔", "♕", "♗", "♘", "♖", "♙"].include? piece([(@position[0] - n), @position[1] - n]).color)
+						@moves << [(@position[0] - n), @position[1] - n]
+					end
+					break
+				elsif (($coords.include? [(@position[0] - n), @position[1] - n]) == false)
+					break
+				end
+				@moves << [(@position[0] - n), @position[1] - n]
+			end
+			#LEFT
+			for o in 1..7
+				if piece_here?([(@position[0] - o), @position[1]])
+					if (@color == "♕") && (["♚", "♛", "♝", "♞", "♜", "♟"].include? piece([(@position[0] - o), @position[1]]).color)
+						@moves << [(@position[0] - o), @position[1]]
+					elsif (@color == "♛") && (["♔", "♕", "♗", "♘", "♖", "♙"].include? piece([(@position[0] - o), @position[1]]).color)
+						@moves << [(@position[0] - o), @position[1]]
+					end
+					break
+				elsif (($coords.include? [(@position[0] - o), @position[1]]) == false)
+					break
+				end
+				@moves << [(@position[0] - o), @position[1]]
+			end
+			#LEFT-UP
+			#p prints so we skip p
+			for q in 1..7
+				if piece_here?([(@position[0] - q), (@position[1] + q)])
+					if (@color == "♕") && (["♚", "♛", "♝", "♞", "♜", "♟"].include? piece([(@position[0] - q), (@position[1] + q)]).color)
+						@moves << [(@position[0] - q), (@position[1] + q)]
+					elsif (@color == "♛") && (["♔", "♕", "♗", "♘", "♖", "♙"].include? piece([(@position[0] - q), (@position[1] + q)]).color)
+						@moves << [(@position[0] - q), (@position[1] + q)]
+					end
+					break
+				elsif (($coords.include? [(@position[0] - q), (@position[1] + q)]) == false)
+					break
+				end
+				@moves << [(@position[0] - q), (@position[1] + q)]
+			end
+		end
+		if ($all.count {|z| z.position == spot}) >= 2
+			@moves.clear
+		end
 	end
 	def capture
 		if @color == "♟"
@@ -586,9 +793,18 @@ class Pawn
 		elsif @color == "♙"
 			@position = [8,1]
 			$w_score += 1
+		elsif @color == "♛"
+			@color = "♟"
+			$b_score += 1
+		elsif @color == "♕"
+			@color = "♙"
+			@position = [8,1]
+			$w_score += 1
 		end
 	end
 end
 
 game = Game.new("test")
 game.show_board
+puts game.w_check?
+puts game.checkmate?
