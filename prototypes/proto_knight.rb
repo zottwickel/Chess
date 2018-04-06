@@ -3,16 +3,13 @@ class Game
 	def initialize(game_name)
 		@game_name = game_name
 		@board = Board.new
-		@WB1 = Bishop.new([2,0], "♝")
-		@WB2 = Bishop.new([5,0], "♝")
-		@BB1 = Bishop.new([2,7], "♗")
-		@BB2 = Bishop.new([5,7], "♗")
-		@WP = Pawn.new([4,1], "♟")
-		@BP = Pawn.new([1,1], "♙")
-		$all = [@WB1, @WB2, @BB1, @BB2, @WP, @BP]
+
+		@WK = Knight.new([4,3], "♞")
+		@BP = Pawn.new([3,4], "♙")
+		$all = [@WK, @BP]
 		$b_score = 0
 		$w_score = 0
-		$all.each {|x| x.set_spot}
+		$all.each {|x| x.set_spot(x.position)}
 	end
 
 	def show_board
@@ -103,7 +100,7 @@ class Game
 					end
 				end
 			end
-			$all.each {|y| y.set_spot}
+			$all.each {|y| y.set_spot(y.position)}
 		else
 			puts "ERROR!!!! Your start position isn't a piece!"
 		end
@@ -166,75 +163,6 @@ class Bishop
 		@color = color
 		@moves = moves
 	end
-	def set_spot(spot=@position)
-		@position = spot
-		@moves = Array.new
-		#Diagonal right, up
-		for i in 1..7
-			if piece_here?([@position[0] + i, (@position[1] + i)])
-				if (@color == "♗") && (["♚", "♛", "♝", "♞", "♜", "♟"].include? piece([@position[0] + i, (@position[1] + i)]).color)
-					@moves << [@position[0] + i, (@position[1] + i)]
-				elsif (@color == "♝") && (["♔", "♕", "♗", "♘", "♖", "♙"].include? piece([@position[0] + i, (@position[1] + i)]).color)
-					@moves << [@position[0] + i, (@position[1] + i)]
-				end
-				break
-			elsif (($coords.include? [@position[0] + i, (@position[1] + i)]) == false)
-				break
-			end
-			@moves << [@position[0] + i, (@position[1] + i)]
-		end
-		#diagonal right, down
-		for j in 1..7
-			if piece_here?([@position[0] + j, (@position[1] - j)])
-				if (@color == "♗") && (["♚", "♛", "♝", "♞", "♜", "♟"].include? piece([@position[0] + j, (@position[1] - j)]).color)
-					@moves << [@position[0] + j, (@position[1] - j)]
-				elsif (@color == "♝") && (["♔", "♕", "♗", "♘", "♖", "♙"].include? piece([@position[0] + j, (@position[1] - j)]).color)
-					@moves << [@position[0] + j, (@position[1] - j)]
-				end
-				break
-			elsif (($coords.include? [@position[0] + j, (@position[1] - j)]) == false)
-				break
-			end
-			@moves << [@position[0] + j, (@position[1] - j)]
-		end
-		#diagonol left down
-		for k in 1..7
-			if piece_here?([(@position[0] - k), @position[1] - k])
-				if (@color == "♗") && (["♚", "♛", "♝", "♞", "♜", "♟"].include? piece([(@position[0] - k), @position[1] - k]).color)
-					@moves << [(@position[0] - k), @position[1] - k]
-				elsif (@color == "♝") && (["♔", "♕", "♗", "♘", "♖", "♙"].include? piece([(@position[0] - k), @position[1] - k]).color)
-					@moves << [(@position[0] - k), @position[1] - k]
-				end
-				break
-			elsif (($coords.include? [(@position[0] - k), @position[1] - k]) == false)
-				break
-			end
-			@moves << [(@position[0] - k), @position[1] - k]
-		end
-		#diagonol left, up
-		for l in 1..7
-			if piece_here?([(@position[0] - l), (@position[1] + l)])
-				if (@color == "♗") && (["♚", "♛", "♝", "♞", "♜", "♟"].include? piece([(@position[0] - l), (@position[1] + l)]).color)
-					@moves << [(@position[0] - l), (@position[1] + l)]
-				elsif (@color == "♝") && (["♔", "♕", "♗", "♘", "♖", "♙"].include? piece([(@position[0] - l), (@position[1] + l)]).color)
-					@moves << [(@position[0] - l), (@position[1] + l)]
-				end
-				break
-			elsif (($coords.include? [(@position[0] - l), (@position[1] + l)]) == false)
-				break
-			end
-			@moves << [(@position[0] - l), (@position[1] + l)]
-		end
-	end
-	def capture
-		if @color == "♝"
-			@position = [8,0]
-			$b_score += 3
-		elsif @color == "♗"
-			@position = [8,1]
-			$w_score += 3
-		end
-	end
 end
 
 class Knight
@@ -244,7 +172,7 @@ class Knight
 		@color = color
 		@moves = moves
 	end
-	def set_spot(spot=@position)
+	def set_spot(spot)
 		@position = spot
 		@moves = Array.new
 		all_on_board = Array.new
@@ -282,7 +210,7 @@ class Rook
 		@color = color
 		@moves = moves
 	end
-	def set_spot(spot=@position)
+	def set_spot(spot)
 		@position = spot
 		@moves = Array.new
 		for i in 1..7
@@ -337,6 +265,7 @@ class Rook
 			end
 			@moves << [(@position[0] - l), @position[1]]
 		end
+
 	end
 	def capture
 		if @color == "♜"
@@ -360,7 +289,8 @@ class Pawn
 			@moves = [[position[0], (position[1] - 2)], [position[0], (position[1] - 1)]]
 		end
 	end
-	def set_spot(spot=@position)
+
+	def set_spot(spot)
 		@moves = Array.new
 		@position = spot
 		if @color == "♟"
@@ -405,13 +335,7 @@ class Pawn
 end
 
 game = Game.new("test")
+#$all.each {|x| x.set_spot(x.position)}
 game.show_board
-$all.each {|x| x.set_spot}
-game.move([1,1], [2,0])
-game.show_board
-game.move([5,0], [4,1])
-game.show_board
-game.move([2,7], [0,5])
-game.show_board
-game.move([0,5], [4,1])
+game.move([3,4], [4,3])
 game.show_board
