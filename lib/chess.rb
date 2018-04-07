@@ -1,5 +1,6 @@
+require "yaml"
 class Game
-	attr_accessor :game_name
+	attr_accessor :game_name, :all, :coords, :all, :turn
 	def initialize(game_name)
 		@game_name = game_name
 		@board = Board.new
@@ -36,15 +37,19 @@ class Game
 		@BP7 = Pawn.new([6,6], "♙")
 		@BP8 = Pawn.new([7,6], "♙")
 		$all = [@WK, @WQ, @WB1, @WB2, @WK1, @WK2, @WR1, @WR2, @WP1, @WP2, @WP3, @WP4, @WP5, @WP6, @WP7, @WP8, @BK, @BQ, @BB1, @BB2, @BK1, @BK2, @BR1, @BR2, @BP1, @BP2, @BP3, @BP4, @BP5, @BP6, @BP7, @BP8]
-		$b_score = 0
-		$w_score = 0
+		@all = $all
+		@coords = Array.new
+		for i in 0...8
+			for j in 0...8
+				@coords << [i,j]
+			end
+		end
 		$all.each {|x| x.set_spot}
+		@turn = "white"
 	end
 
 	def show_board
-		board_string ="Here is your chess board:
-
- 
+		board_string ="
  ╔═══╦═══╦═══╦═══╦═══╦═══╦═══╦═══╗     Black's captured pieces:
 8║▒#{w_space_piece(0,7)}▒║ #{b_space_piece(1,7)} ║▒#{w_space_piece(2,7)}▒║ #{b_space_piece(3,7)} ║▒#{w_space_piece(4,7)}▒║ #{b_space_piece(5,7)} ║▒#{w_space_piece(6,7)}▒║ #{b_space_piece(7,7)} ║    ┏━━━━━━
  ╠═══╬═══╬═══╬═══╬═══╬═══╬═══╬═══╣    ┃#{b_captured}
@@ -67,11 +72,51 @@ class Game
 	end
 
 	def b_score
-		$b_score
+		b_score = 0
+		captured = Array.new
+		$all.each do |x| 
+			if x.position == [8,0] 
+				captured << x
+			end
+		end
+		captured.each do |y|
+			if y.color == "♟"
+				b_score += 1
+			elsif y.color == "♜"
+				b_score += 5
+			elsif y.color == "♞"
+				b_score += 3
+			elsif y.color == "♝"
+				b_score += 3
+			elsif y.color == "♛"
+				b_score += 9
+			end
+		end
+		return b_score
 	end
 
 	def w_score
-		$w_score
+		w_score = 0
+		captured = Array.new
+		$all.each do |x|
+			if x.position == [8,1]
+				captured << x
+			end
+		end
+		captured.each do |y|
+			if y.color == "♙"
+				w_score += 1
+			elsif y.color == "♖"
+				w_score += 5
+			elsif y.color == "♘"
+				w_score += 3
+			elsif y.color == "♗"
+				w_score += 3
+			elsif y.color == "♕"
+				w_score += 9
+			end
+		end
+		return w_score
 	end
 
 	def w_space_piece(x,y)
@@ -129,6 +174,7 @@ class Game
 				if ["♖", "♔"].include? piece(destination).color
 					piece(destination).moved = true
 				end
+				system "clear"
 				puts "Piece moved"
 			end
 		elsif ["♚", "♛", "♝", "♞", "♜", "♟"].include? piece(start).color
@@ -147,6 +193,7 @@ class Game
 				if ["♜", "♚"].include? piece(destination).color
 					piece(destination).moved = true
 				end
+				system "clear"
 				puts "Piece moved"
 			end
 		end
@@ -160,16 +207,20 @@ class Game
 						@WK.position = [2, 0]
 						@WR2.position = [3, 0]
 						$all.each {|y| y.set_spot}
+						system "clear"
 						puts "Castled"
 					else
+						system "clear"
 						puts "Unable to castle there!"
 						white_turn
 					end
 				else
+					system "clear"
 					puts "Unable to castle there!"
 					white_turn
 				end
 			else
+				system "clear"
 				puts "Unable to castle there!"
 				white_turn
 			end
@@ -180,16 +231,20 @@ class Game
 						@WK.position = [6, 0]
 						@WR1.position = [5, 0]
 						$all.each {|y| y.set_spot}
+						system "clear"
 						puts "Castled"
 					else
+						system "clear"
 						puts "Unable to castle there"
 						white_turn
 					end
 				else
+					system "clear"
 					puts "Unable to castle there"
 					white_turn
 				end
 			else
+				system "clear"
 				puts "Unable to castle there!"
 				white_turn
 			end
@@ -200,16 +255,20 @@ class Game
 						@BK.position = [6, 7]
 						@BR1.position = [5, 7]
 						$all.each {|y| y.set_spot}
+						system "clear"
 						puts "Castled"
 					else
+						system "clear"
 						puts "Unable to castle there!"
 						black_turn
 					end
 				else
+					system "clear"
 					puts "Unable to castle there!"
 					black_turn
 				end
 			else
+				system "clear"
 				puts "Unable to castle there!"
 				black_turn
 			end
@@ -220,16 +279,21 @@ class Game
 						@BK.position = [2, 7]
 						@BR2.position = [3, 7]
 						$all.each {|y| y.set_spot}
+						system "clear"
 						puts "Castled"
 					else
+						system "clear"
 						puts "Unable to castle here"
 						black_turn
 					end
 				else
+
+					system "clear"
 					puts "Unable to castle here"
 					black_turn
 				end
 			else
+				system "clear"
 				puts "Unable to castle there!"
 				black_turn
 			end
@@ -319,7 +383,7 @@ class Board
 		$coords = Array.new
 		for i in 0...8
 			for j in 0...8
-				$coords.push([i,j])
+				$coords << [i,j]
 			end
 		end
 	end
@@ -488,10 +552,8 @@ class Queen
 	def capture
 		if @color == "♛"
 			@position = [8,0]
-			$b_score += 9
 		elsif @color == "♕"
 			@position = [8,1]
-			$w_score += 9
 		end
 	end
 	
@@ -570,10 +632,8 @@ class Bishop
 	def capture
 		if @color == "♝"
 			@position = [8,0]
-			$b_score += 3
 		elsif @color == "♗"
 			@position = [8,1]
-			$w_score += 3
 		end
 	end
 end
@@ -611,10 +671,8 @@ class Knight
 	def capture
 		if @color == "♞"
 			@position = [8,0]
-			$b_score += 3
 		elsif @color == "♘"
 			@position = [8,1]
-			$w_score += 3
 		end
 	end
 end
@@ -693,10 +751,8 @@ class Rook
 	def capture
 		if @color == "♜"
 			@position = [8,0]
-			$b_score += 5
 		elsif @color == "♖"
 			@position = [8,1]
-			$w_score += 5
 		end
 	end
 end
@@ -718,7 +774,7 @@ class Pawn
 		if @position[1] == 7
 			@color = "♛"
 		end
-		if @position[1] == 0
+		if (@position[1] == 0) && (@position[0] != 8)
 			@color = "♕"
 		end
 		if @color == "♟"
@@ -871,17 +927,14 @@ class Pawn
 	def capture
 		if @color == "♟"
 			@position = [8,0]
-			$b_score += 1
 		elsif @color == "♙"
 			@position = [8,1]
-			$w_score += 1
 		elsif @color == "♛"
 			@color = "♟"
-			$b_score += 1
+			@position = [8,0]
 		elsif @color == "♕"
 			@color = "♙"
 			@position = [8,1]
-			$w_score += 1
 		end
 	end
 end
@@ -889,173 +942,238 @@ end
 ##############METHODS FOR THE PROCESS#####################
 
 def new_game
-	system "clear"
 	puts "Welcome to the wonderful game of chess!"
-	puts "What would you like to name your new game?"
-	print "Answer:"
-	game_name = gets.chomp
-	$game = Game.new(game_name)
+	if Dir.entries("save").length > 2
+		puts "You have unfinished games!"
+		puts "\n"
+		save_dir = Dir.entries("save")
+		save_dir.each {|x| puts x.chomp(".yaml") + "\n" unless (x == ".") || (x == "..") || (x == ".ignoreme")}
+		puts "\n"
+		puts "Type the name of the game you want to resume, or type NEW to make a new one!"
+		print "File: "
+		file_name = gets.chomp
+		if file_name == "NEW"
+			puts "What would you like to name your new game?"
+			print "Name: "
+			game_name = gets.chomp.downcase
+			if Dir.entries("save").include? (game_name + ".yaml")
+				while Dir.entries("save").include? (game_name + ".yaml")
+					puts "Game name already exists! Please try again!"
+					print "Name: "
+					game_name = gets.chomp.downcase
+				end
+			end
+			$game = Game.new(game_name)
+		elsif save_dir.include? file_name + ".yaml"
+			$game = YAML.load(File.read( "save/" + file_name + ".yaml"))
+			$all = $game.all
+			$coords = $game.coords
+		end
+	else
+		puts "What would you like to name your new game?"
+		print "Name: "
+		game_name = gets.chomp.downcase
+		if Dir.entries("save").include? (game_name + ".yaml")
+			while Dir.entries("save").include? (game_name + ".yaml")
+				puts "Game name already exists! Please try again!"
+				print "Name: "
+				game_name = gets.chomp.downcase
+			end
+		end
+		$game = Game.new(game_name)
+	end
 end
 
 def white_turn
-	$game.show_board
-	puts "It's white's turn, please input your move in the letter-number format i.e e2e4."
-	if $game.w_check? == true
-		puts "You are in check!"
-	end
-	print "Your move:"
-	string = gets.chomp
-	if string == "O-O"
-		$game.castle("white", "right")
-	elsif string == "O-O-O"
-		$game.castle("white", "left")
-	elsif string.length == 4
-		letters = ["a", "b", "c", "d", "e", "f", "g", "h"]
-		numbers = ["1", "2", "3", "4", "5", "6", "7", "8"]
-		if (letters.include? string[0]) && (letters.include? string[2]) && (numbers.include? string[1]) && (numbers.include? string[3])
-			start = Array.new
-			dest = Array.new
-			start << letters.index(string[0])
-			start << numbers.index(string[1])
-			dest << letters.index(string[2])
-			dest << numbers.index(string[3])
-			if piece_here?(start) == true
-				if ["♚", "♛", "♝", "♞", "♜", "♟"].include? piece(start).color
-					if piece(start).moves.include? dest
-						piece(start).position = [8, 2]
-						$all.each {|x| x.set_spot}
-						if $game.w_check? == true
-							piece([8, 2]).position = start
+	if $game.turn == "white"
+		$game.show_board
+		puts "It's white's turn, please input your move in the letter-number format i.e e2e4."
+		puts "You can also put SAVE to save & quit or QUIT to quit without saving."
+		if $game.w_check? == true
+			puts "You are in check!"
+		end
+		print "Your move: "
+		string = gets.chomp
+		if string == "QUIT"
+			puts "Goodbye!"
+			exit
+		elsif string == "SAVE"
+			$game.all = $all
+			$game.coords = $coords
+			game_dump = YAML.dump($game)
+			File.new("save/" + $game.game_name + ".yaml", "w").write(game_dump)
+			exit
+		elsif string == "O-O"
+			$game.castle("white", "right")
+		elsif string == "O-O-O"
+			$game.turn = "black"
+			$game.castle("white", "left")
+			$game.turn = "black"
+		elsif string.length == 4
+			letters = ["a", "b", "c", "d", "e", "f", "g", "h"]
+			numbers = ["1", "2", "3", "4", "5", "6", "7", "8"]
+			if (letters.include? string[0]) && (letters.include? string[2]) && (numbers.include? string[1]) && (numbers.include? string[3])
+				start = Array.new
+				dest = Array.new
+				start << letters.index(string[0])
+				start << numbers.index(string[1])
+				dest << letters.index(string[2])
+				dest << numbers.index(string[3])
+				if piece_here?(start) == true
+					if ["♚", "♛", "♝", "♞", "♜", "♟"].include? piece(start).color
+						if piece(start).moves.include? dest
+							piece(start).position = [8, 2]
 							$all.each {|x| x.set_spot}
-							system "clear"
-							puts "ERROR!!!! This would put your king in check!!!"
-							white_turn
-						else
-							if piece_here?(dest)
-								piece(dest).capture
+							if $game.w_check? == true
+								piece([8, 2]).position = start
+								$all.each {|x| x.set_spot}
+								system "clear"
+								puts "ERROR!!!! This would put your king in check!!!"
+								white_turn
+							else
+								if piece_here?(dest)
+									piece(dest).capture
+								end
+								piece([8, 2]).position = dest
+								$all.each {|x| x.set_spot}
+								if ["♜", "♚"].include? piece(dest).color
+									piece(dest).moved = true
+								end
+								$game.turn = "black"
+								system "clear"
+								puts "Piece moved"
 							end
-							piece([8, 2]).position = dest
-							$all.each {|x| x.set_spot}
-							if ["♜", "♚"].include? piece(dest).color
-								piece(dest).moved = true
-							end
-							system "clear"
-							puts "Piece moved"
-						end
 
-						if $game.checkmate? == true
+							if $game.checkmate? == true
+								system "clear"
+								puts "White has checkmated black!"
+								$game.show_board
+								exit
+							end
+						else
 							system "clear"
-							puts "White has checkmated black!"
-							$game.show_board
-							exit
+							puts "Your destination was not valid!"
+							white_turn
 						end
 					else
 						system "clear"
-						puts "Your destination was not valid!"
+						puts "You can't move your enemy's piece!"
 						white_turn
 					end
 				else
 					system "clear"
-					puts "You can't move your enemy's piece!"
+					puts "There's nothing at your start point!"
 					white_turn
 				end
 			else
 				system "clear"
-				puts "There's nothing at your start point!"
+				puts "ERROR!!! Wrong format!"
 				white_turn
 			end
 		else
 			system "clear"
-			puts "ERROR!!! Wrong format!"
+			puts "ERROR!!! Please put it in the correct format. (O-O-O or O-O for castling)"
 			white_turn
 		end
-	else
-		system "clear"
-		puts "ERROR!!! Please put it in the correct format. (O-O-O or O-O for castling)"
-		white_turn
 	end
 end
 
 def black_turn
-	$game.show_board
-	puts "It's black's turn, please input your move in the letter-number format i.e e7e6."
-	if $game.b_check? == true
-		puts "You are in check!"
-	end
-	print "Your move:"
-	string = gets.chomp
-	if string == "O-O"
-		$game.castle("black", "right")
-	elsif string == "O-O-O"
-		$game.castle("black", "left")
-	elsif string.length == 4
-		letters = ["a", "b", "c", "d", "e", "f", "g", "h"]
-		numbers = ["1", "2", "3", "4", "5", "6", "7", "8"]
-		if (letters.include? string[0]) && (letters.include? string[2]) && (numbers.include? string[1]) && (numbers.include? string[3])
-			start = Array.new
-			dest = Array.new
-			start << letters.index(string[0])
-			start << numbers.index(string[1])
-			dest << letters.index(string[2])
-			dest << numbers.index(string[3])
-			if piece_here?(start) == true
-				if ["♔", "♕", "♗", "♘", "♖", "♙"].include? piece(start).color
-					if piece(start).moves.include? dest
-						piece(start).position = [8, 2]
-						$all.each {|x| x.set_spot}
-						if $game.w_check? == true
-							piece([8, 2]).position = start
+	if $game.turn == "black"
+		$game.show_board
+		puts "It's black's turn, please input your move in the letter-number format i.e e7e6."
+		puts "You can also put SAVE to save & quit or QUIT to quit without saving."
+		if $game.b_check? == true
+			puts "You are in check!"
+		end
+		print "Your move: "
+		string = gets.chomp
+		if string == "QUIT"
+			puts "Goodbye!"
+			exit
+		elsif string == "SAVE"
+			$game.all = $all
+			$game.coords = $coords
+			game_dump = YAML.dump($game)
+			File.new("save/" + $game.game_name + ".yaml", "w").write(game_dump)
+			exit
+		elsif string == "O-O"
+			$game.castle("black", "right")
+			$game.turn = "white"
+		elsif string == "O-O-O"
+			$game.turn = "white"
+			$game.castle("black", "left")
+		elsif string.length == 4
+			letters = ["a", "b", "c", "d", "e", "f", "g", "h"]
+			numbers = ["1", "2", "3", "4", "5", "6", "7", "8"]
+			if (letters.include? string[0]) && (letters.include? string[2]) && (numbers.include? string[1]) && (numbers.include? string[3])
+				start = Array.new
+				dest = Array.new
+				start << letters.index(string[0])
+				start << numbers.index(string[1])
+				dest << letters.index(string[2])
+				dest << numbers.index(string[3])
+				if piece_here?(start) == true
+					if ["♔", "♕", "♗", "♘", "♖", "♙"].include? piece(start).color
+						if piece(start).moves.include? dest
+							piece(start).position = [8, 2]
 							$all.each {|x| x.set_spot}
+							if $game.w_check? == true
+								piece([8, 2]).position = start
+								$all.each {|x| x.set_spot}
 
-							system "clear"
-							puts "ERROR!!!! This would put your king in check!!!"
-							black_turn
+								system "clear"
+								puts "ERROR!!!! This would put your king in check!!!"
+								black_turn
+							else
+								if piece_here?(dest)
+									piece(dest).capture
+								end
+								piece([8, 2]).position = dest
+								$all.each {|x| x.set_spot}
+								if ["♖", "♔"].include? piece(dest).color
+									piece(dest).moved = true
+								end
+								$game.turn = "white"
+								system "clear"
+								puts "Piece moved"
+							end
+
+							if $game.checkmate? == true
+
+								system "clear"
+								puts "Black has checkmated white!"
+								$game.show_board
+								exit
+							end
 						else
-							if piece_here?(dest)
-								piece(dest).capture
-							end
-							piece([8, 2]).position = dest
-							$all.each {|x| x.set_spot}
-							if ["♖", "♔"].include? piece(dest).color
-								piece(dest).moved = true
-							end
 							system "clear"
-							puts "Piece moved"
-						end
-
-						if $game.checkmate? == true
-
-							system "clear"
-							puts "Black has checkmated white!"
-							$game.show_board
-							exit
+							puts "Your move was not valid!"
+							black_turn
 						end
 					else
 						system "clear"
-						puts "Your move was not valid!"
+						puts "You can't move your enemy's piece!"
 						black_turn
 					end
 				else
 					system "clear"
-					puts "You can't move your enemy's piece!"
+					puts "There's nothing at your start point!"
 					black_turn
 				end
 			else
 				system "clear"
-				puts "There's nothing at your start point!"
+				puts "ERROR!!! Wrong format!"
 				black_turn
 			end
 		else
 			system "clear"
-			puts "ERROR!!! Wrong format!"
+			puts "ERROR!!! Please put it in the correct format. (O-O-O or O-O for castling)"
 			black_turn
 		end
-	else
-		system "clear"
-		puts "ERROR!!! Please put it in the correct format. (O-O-O or O-O for castling)"
-		black_turn
 	end
 end
+
 
 new_game
 
