@@ -1,5 +1,5 @@
 class Game
-	def initialize(game_name)
+		def initialize(game_name)
 		@game_name = game_name
 		@board = Board.new
 		@WK = King.new([4,0],"♚")
@@ -40,7 +40,7 @@ class Game
 		$all.each {|x| x.set_spot}
 	end
 
-	def show_board
+		def show_board
 		board_string ="Here is your chess board:
 
   (0) (1) (2) (3) (4) (5) (6) (7)
@@ -112,7 +112,7 @@ class Game
 	end
 
 	def move(start, destination)
-		if  piece(start).moves.include? desitination
+		if  piece(start).moves.include? destination
 			if $coords.include? destination
 				if ["♔", "♕", "♗", "♘", "♖", "♙"].include? piece(start).color
 					piece(start).position = [8, 2]
@@ -127,7 +127,10 @@ class Game
 						end
 						piece([8, 2]).position = destination
 						$all.each {|x| x.set_spot}
-						puts "piece moved"
+						if ["♖", "♔"].include? piece(destination).color
+							piece(destination).moved = true
+						end
+						puts "Piece moved"
 					end
 				elsif ["♚", "♛", "♝", "♞", "♜", "♟"].include? piece(start).color
 					piece(start).position = [8, 2]
@@ -142,7 +145,10 @@ class Game
 						end
 						piece([8, 2]).position = destination
 						$all.each {|x| x.set_spot}
-						puts "piece moved"
+						if ["♜", "♚"].include? piece(destination).color
+							piece(destination).moved = true
+						end
+						puts "Piece moved"
 					end
 				end
 			else
@@ -150,6 +156,62 @@ class Game
 			end
 		else
 			puts "ERROR!!!! Your start position isn't a valid!"
+		end
+	end
+
+	def castle(color, direction)
+		if (color == "white") && (direction == "left")
+			if ($all.any? {|x| [[1, 0], [2, 0], [3, 0]].include? x.position} == false)
+				if (@WR2.moved == false) && (@WK.moved == false) && (w_check? == false)
+					unless $all.any? {|x| ((x.moves.include? [1, 0]) || (x.moves.include? [2, 0]) || (x.moves.include? [3, 0])) && (["♔", "♕", "♗", "♘", "♖", "♙"].include? x.color)}
+						@WK.position = [2, 0]
+						@WR2.position = [3, 0]
+						$all.each {|y| y.set_spot}
+						puts "Castled"
+					end
+				end
+			else
+				puts "Unable to castle there!"
+			end
+		elsif (color == "white") && (direction == "right")
+			if ($all.any? {|x| [[5, 0], [6, 0]].include? x.position}) == false
+				if (@WR1.moved == false) && (@WK.moved == false) && (w_check? == false)
+					unless $all.any? {|x| ((x.moves.include? [6, 0]) || (x.moves.include? [5, 0])) && (["♔", "♕", "♗", "♘", "♖", "♙"].include? x.color)}
+						@WK.position = [6, 0]
+						@WR1.position = [5, 0]
+						$all.each {|y| y.set_spot}
+						puts "Castled"
+					end
+				end
+			else
+				puts "Unable to castle there!"
+			end
+		elsif (color == "black") && (direction == "right")
+			if ($all.any? {|x| [[5, 7], [6, 7]].include? x.position}) == false
+				if (@BR1.moved == false) && (@BK.moved == false) && (b_check? == false)
+					unless $all.any? {|x| ((x.moves.include? [6, 7]) || (x.moves.include? [5, 7])) && (["♚", "♛", "♝", "♞", "♜", "♟"].include? x.color)}
+						@BK.position = [6, 7]
+						@BR1.position = [5, 7]
+						$all.each {|y| y.set_spot}
+						puts "Castled"
+					end
+				end
+			else
+				puts "Unable to castle there!"
+			end
+		elsif (color == "black") && (direction == "left")
+			if ($all.any? {|x| [[1, 7], [2, 7], [3, 7]].include? x.position} == false)
+				if (@BR2.moved == false) && (@BK.moved == false) && (b_check? == false)
+					unless $all.any? {|x| ((x.moves.include? [1, 7]) || (x.moves.include? [2, 7]) || (x.moves.include? [3, 7])) && (["♚", "♛", "♝", "♞", "♜", "♟"].include? x.color)}
+						@BK.position = [2, 7]
+						@BR2.position = [3, 7]
+						$all.each {|y| y.set_spot}
+						puts "Castled"
+					end
+				end
+			else
+				puts "Unable to castle there!"
+			end
 		end
 	end
 
@@ -246,11 +308,12 @@ class Board
 end
 
 class King
-	attr_accessor :position, :color, :moves
+	attr_accessor :position, :color, :moves, :moved
 	def initialize(position, color, moves=[])
 		@position = position
 		@color = color
 		@moves = moves
+		@moved = false
 	end
 	def set_spot(spot=@position)
 		@position = spot
@@ -539,11 +602,12 @@ class Knight
 end
 
 class Rook
-	attr_accessor :position, :color, :moves
+	attr_accessor :position, :color, :moves, :moved
 	def initialize(position, color, moves=[])
 		@position = position
 		@color = color
 		@moves = moves
+		@moved = false
 	end
 	def set_spot(spot=@position)
 		@position = spot
@@ -803,6 +867,3 @@ class Pawn
 		end
 	end
 end
-
-game = Game.new("test")
-game.show_board
