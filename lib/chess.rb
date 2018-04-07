@@ -942,7 +942,24 @@ end
 ##############METHODS FOR THE PROCESS#####################
 
 def new_game
-	puts "Welcome to the wonderful game of chess!"
+	puts "
+                          ♚WELCOME TO♚
+        ╔═════════════════════════════════════════════╗
+        ║ ┏━━━━━━  ╻     ╻  ┏━━━━━━  ┏━━━━━━  ┏━━━━━━ ║
+        ║ ┃        ┃     ┃  ┃        ┃        ┃       ║
+        ║ ┃        ┃	 ┃  ┃        ┃        ┃       ║
+        ║ ┃        ┣━━━━━┫  ┣━━━━━━  ┗━━━━━┓  ┗━━━━━┓ ║
+        ║ ┃        ┃     ┃  ┃              ┃        ┃ ║
+        ║ ┃        ┃     ┃  ┃              ┃        ┃ ║
+        ║ ┗━━━━━━  ╹     ╹  ┗━━━━━━  ━━━━━━┛  ━━━━━━┛ ║
+        ╚═════════════════════════════════════════════╝
+                     ♔THE GAME OF LEGENDS♔
+
+
+
+
+
+"
 	if Dir.entries("save").length > 2
 		puts "You have unfinished games!"
 		puts "\n"
