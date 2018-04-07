@@ -1,5 +1,6 @@
 class Game
-		def initialize(game_name)
+	attr_accessor :game_name
+	def initialize(game_name)
 		@game_name = game_name
 		@board = Board.new
 		@WK = King.new([4,0],"♚")
@@ -40,26 +41,26 @@ class Game
 		$all.each {|x| x.set_spot}
 	end
 
-		def show_board
+	def show_board
 		board_string ="Here is your chess board:
 
-  (0) (1) (2) (3) (4) (5) (6) (7)
+ 
  ╔═══╦═══╦═══╦═══╦═══╦═══╦═══╦═══╗     Black's captured pieces:
-8║▒#{w_space_piece(0,7)}▒║ #{b_space_piece(1,7)} ║▒#{w_space_piece(2,7)}▒║ #{b_space_piece(3,7)} ║▒#{w_space_piece(4,7)}▒║ #{b_space_piece(5,7)} ║▒#{w_space_piece(6,7)}▒║ #{b_space_piece(7,7)} ║(7) ┏━━━━━━
+8║▒#{w_space_piece(0,7)}▒║ #{b_space_piece(1,7)} ║▒#{w_space_piece(2,7)}▒║ #{b_space_piece(3,7)} ║▒#{w_space_piece(4,7)}▒║ #{b_space_piece(5,7)} ║▒#{w_space_piece(6,7)}▒║ #{b_space_piece(7,7)} ║    ┏━━━━━━
  ╠═══╬═══╬═══╬═══╬═══╬═══╬═══╬═══╣    ┃#{b_captured}
-7║ #{b_space_piece(0,6)} ║▒#{w_space_piece(1,6)}▒║ #{b_space_piece(2,6)} ║▒#{w_space_piece(3,6)}▒║ #{b_space_piece(4,6)} ║▒#{w_space_piece(5,6)}▒║ #{b_space_piece(6,6)} ║▒#{w_space_piece(7,6)}▒║(6) ┗━━━━━━
+7║ #{b_space_piece(0,6)} ║▒#{w_space_piece(1,6)}▒║ #{b_space_piece(2,6)} ║▒#{w_space_piece(3,6)}▒║ #{b_space_piece(4,6)} ║▒#{w_space_piece(5,6)}▒║ #{b_space_piece(6,6)} ║▒#{w_space_piece(7,6)}▒║    ┗━━━━━━
  ╠═══╬═══╬═══╬═══╬═══╬═══╬═══╬═══╣
-6║▒#{w_space_piece(0,5)}▒║ #{b_space_piece(1,5)} ║▒#{w_space_piece(2,5)}▒║ #{b_space_piece(3,5)} ║▒#{w_space_piece(4,5)}▒║ #{b_space_piece(5,5)} ║▒#{w_space_piece(6,5)}▒║ #{b_space_piece(7,5)} ║(5)
+6║▒#{w_space_piece(0,5)}▒║ #{b_space_piece(1,5)} ║▒#{w_space_piece(2,5)}▒║ #{b_space_piece(3,5)} ║▒#{w_space_piece(4,5)}▒║ #{b_space_piece(5,5)} ║▒#{w_space_piece(6,5)}▒║ #{b_space_piece(7,5)} ║   
  ╠═══╬═══╬═══╬═══╬═══╬═══╬═══╬═══╣     Black's score : #{b_score}
-5║ #{b_space_piece(0,4)} ║▒#{w_space_piece(1,4)}▒║ #{b_space_piece(2,4)} ║▒#{w_space_piece(3,4)}▒║ #{b_space_piece(4,4)} ║▒#{w_space_piece(5,4)}▒║ #{b_space_piece(6,4)} ║▒#{w_space_piece(7,4)}▒║(4)
+5║ #{b_space_piece(0,4)} ║▒#{w_space_piece(1,4)}▒║ #{b_space_piece(2,4)} ║▒#{w_space_piece(3,4)}▒║ #{b_space_piece(4,4)} ║▒#{w_space_piece(5,4)}▒║ #{b_space_piece(6,4)} ║▒#{w_space_piece(7,4)}▒║   
  ╠═══╬═══╬═══╬═══╬═══╬═══╬═══╬═══╣
-4║▒#{w_space_piece(0,3)}▒║ #{b_space_piece(1,3)} ║▒#{w_space_piece(2,3)}▒║ #{b_space_piece(3,3)} ║▒#{w_space_piece(4,3)}▒║ #{b_space_piece(5,3)} ║▒#{w_space_piece(6,3)}▒║ #{b_space_piece(7,3)} ║(3)
+4║▒#{w_space_piece(0,3)}▒║ #{b_space_piece(1,3)} ║▒#{w_space_piece(2,3)}▒║ #{b_space_piece(3,3)} ║▒#{w_space_piece(4,3)}▒║ #{b_space_piece(5,3)} ║▒#{w_space_piece(6,3)}▒║ #{b_space_piece(7,3)} ║   
  ╠═══╬═══╬═══╬═══╬═══╬═══╬═══╬═══╣     White's score : #{w_score}
-3║ #{b_space_piece(0,2)} ║▒#{w_space_piece(1,2)}▒║ #{b_space_piece(2,2)} ║▒#{w_space_piece(3,2)}▒║ #{b_space_piece(4,2)} ║▒#{w_space_piece(5,2)}▒║ #{b_space_piece(6,2)} ║▒#{w_space_piece(7,2)}▒║(2)
+3║ #{b_space_piece(0,2)} ║▒#{w_space_piece(1,2)}▒║ #{b_space_piece(2,2)} ║▒#{w_space_piece(3,2)}▒║ #{b_space_piece(4,2)} ║▒#{w_space_piece(5,2)}▒║ #{b_space_piece(6,2)} ║▒#{w_space_piece(7,2)}▒║   
  ╠═══╬═══╬═══╬═══╬═══╬═══╬═══╬═══╣
-2║▒#{w_space_piece(0,1)}▒║ #{b_space_piece(1,1)} ║▒#{w_space_piece(2,1)}▒║ #{b_space_piece(3,1)} ║▒#{w_space_piece(4,1)}▒║ #{b_space_piece(5,1)} ║▒#{w_space_piece(6,1)}▒║ #{b_space_piece(7,1)} ║(1)  White's captured pieces:
+2║▒#{w_space_piece(0,1)}▒║ #{b_space_piece(1,1)} ║▒#{w_space_piece(2,1)}▒║ #{b_space_piece(3,1)} ║▒#{w_space_piece(4,1)}▒║ #{b_space_piece(5,1)} ║▒#{w_space_piece(6,1)}▒║ #{b_space_piece(7,1)} ║     White's captured pieces:
  ╠═══╬═══╬═══╬═══╬═══╬═══╬═══╬═══╣    ┏━━━━━━
-1║ #{b_space_piece(0,0)} ║▒#{w_space_piece(1,0)}▒║ #{b_space_piece(2,0)} ║▒#{w_space_piece(3,0)}▒║ #{b_space_piece(4,0)} ║▒#{w_space_piece(5,0)}▒║ #{b_space_piece(6,0)} ║▒#{w_space_piece(7,0)}▒║(0) ┃#{w_captured}
+1║ #{b_space_piece(0,0)} ║▒#{w_space_piece(1,0)}▒║ #{b_space_piece(2,0)} ║▒#{w_space_piece(3,0)}▒║ #{b_space_piece(4,0)} ║▒#{w_space_piece(5,0)}▒║ #{b_space_piece(6,0)} ║▒#{w_space_piece(7,0)}▒║    ┃#{w_captured}
  ╚═══╩═══╩═══╩═══╩═══╩═══╩═══╩═══╝    ┗━━━━━━
    a   b   c   d   e   f   g   h"
    		puts board_string
@@ -112,50 +113,42 @@ class Game
 	end
 
 	def move(start, destination)
-		if  piece(start).moves.include? destination
-			if $coords.include? destination
-				if ["♔", "♕", "♗", "♘", "♖", "♙"].include? piece(start).color
-					piece(start).position = [8, 2]
-					$all.each {|x| x.set_spot}
-					if b_check?
-						piece([8, 2]).position = start
-						$all.each {|x| x.set_spot}
-						puts "ERROR!!!! This would put your king in check!!!"
-					else
-						if piece_here?(destination)
-							piece(destination).capture
-						end
-						piece([8, 2]).position = destination
-						$all.each {|x| x.set_spot}
-						if ["♖", "♔"].include? piece(destination).color
-							piece(destination).moved = true
-						end
-						puts "Piece moved"
-					end
-				elsif ["♚", "♛", "♝", "♞", "♜", "♟"].include? piece(start).color
-					piece(start).position = [8, 2]
-					$all.each {|x| x.set_spot}
-					if w_check?
-						piece([8, 2]).position = start
-						$all.each {|x| x.set_spot}
-						puts "ERROR!!!! This would put your king in check!!!"
-					else
-						if piece_here?(destination)
-							piece(destination).capture
-						end
-						piece([8, 2]).position = destination
-						$all.each {|x| x.set_spot}
-						if ["♜", "♚"].include? piece(destination).color
-							piece(destination).moved = true
-						end
-						puts "Piece moved"
-					end
-				end
+		if ["♔", "♕", "♗", "♘", "♖", "♙"].include? piece(start).color
+			piece(start).position = [8, 2]
+			$all.each {|x| x.set_spot}
+			if b_check?
+				piece([8, 2]).position = start
+				$all.each {|x| x.set_spot}
+				puts "ERROR!!!! This would put your king in check!!!"
 			else
-				puts "ERROR!!!! your destination isn't valid!"
+				if piece_here?(destination)
+					piece(destination).capture
+				end
+				piece([8, 2]).position = destination
+				$all.each {|x| x.set_spot}
+				if ["♖", "♔"].include? piece(destination).color
+					piece(destination).moved = true
+				end
+				puts "Piece moved"
 			end
-		else
-			puts "ERROR!!!! Your start position isn't a valid!"
+		elsif ["♚", "♛", "♝", "♞", "♜", "♟"].include? piece(start).color
+			piece(start).position = [8, 2]
+			$all.each {|x| x.set_spot}
+			if w_check?
+				piece([8, 2]).position = start
+				$all.each {|x| x.set_spot}
+				puts "ERROR!!!! This would put your king in check!!!"
+			else
+				if piece_here?(destination)
+					piece(destination).capture
+				end
+				piece([8, 2]).position = destination
+				$all.each {|x| x.set_spot}
+				if ["♜", "♚"].include? piece(destination).color
+					piece(destination).moved = true
+				end
+				puts "Piece moved"
+			end
 		end
 	end
 
@@ -168,10 +161,17 @@ class Game
 						@WR2.position = [3, 0]
 						$all.each {|y| y.set_spot}
 						puts "Castled"
+					else
+						puts "Unable to castle there!"
+						white_turn
 					end
+				else
+					puts "Unable to castle there!"
+					white_turn
 				end
 			else
 				puts "Unable to castle there!"
+				white_turn
 			end
 		elsif (color == "white") && (direction == "right")
 			if ($all.any? {|x| [[5, 0], [6, 0]].include? x.position}) == false
@@ -181,10 +181,17 @@ class Game
 						@WR1.position = [5, 0]
 						$all.each {|y| y.set_spot}
 						puts "Castled"
+					else
+						puts "Unable to castle there"
+						white_turn
 					end
+				else
+					puts "Unable to castle there"
+					white_turn
 				end
 			else
 				puts "Unable to castle there!"
+				white_turn
 			end
 		elsif (color == "black") && (direction == "right")
 			if ($all.any? {|x| [[5, 7], [6, 7]].include? x.position}) == false
@@ -194,10 +201,17 @@ class Game
 						@BR1.position = [5, 7]
 						$all.each {|y| y.set_spot}
 						puts "Castled"
+					else
+						puts "Unable to castle there!"
+						black_turn
 					end
+				else
+					puts "Unable to castle there!"
+					black_turn
 				end
 			else
 				puts "Unable to castle there!"
+				black_turn
 			end
 		elsif (color == "black") && (direction == "left")
 			if ($all.any? {|x| [[1, 7], [2, 7], [3, 7]].include? x.position} == false)
@@ -207,10 +221,17 @@ class Game
 						@BR2.position = [3, 7]
 						$all.each {|y| y.set_spot}
 						puts "Castled"
+					else
+						puts "Unable to castle here"
+						black_turn
 					end
+				else
+					puts "Unable to castle here"
+					black_turn
 				end
 			else
 				puts "Unable to castle there!"
+				black_turn
 			end
 		end
 	end
@@ -273,7 +294,7 @@ class Game
 		end
 	end
 end
-#####################ALL METHODS OUTSIDE GAME######################################
+############ALL METHODS OUTSIDE GAME USED BY GAME & PIECES#######################
 def piece(loc)
 	if piece_here?(loc)
 		$all.each do |x|
@@ -291,10 +312,7 @@ def piece_here?(loc)
 		return false
 	end
 end
-
-
-
-#####################ALL CLASSES THAT ARE OUTSIDE GAME############################
+#####################ALL CLASSES THAT ARE PIECES############################
 class Board
 	attr_accessor :coords
 	def initialize
@@ -866,4 +884,182 @@ class Pawn
 			$w_score += 1
 		end
 	end
+end
+
+##############METHODS FOR THE PROCESS#####################
+
+def new_game
+	system "clear"
+	puts "Welcome to the wonderful game of chess!"
+	puts "What would you like to name your new game?"
+	print "Answer:"
+	game_name = gets.chomp
+	$game = Game.new(game_name)
+end
+
+def white_turn
+	$game.show_board
+	puts "It's white's turn, please input your move in the letter-number format i.e e2e4."
+	if $game.w_check? == true
+		puts "You are in check!"
+	end
+	print "Your move:"
+	string = gets.chomp
+	if string == "O-O"
+		$game.castle("white", "right")
+	elsif string == "O-O-O"
+		$game.castle("white", "left")
+	elsif string.length == 4
+		letters = ["a", "b", "c", "d", "e", "f", "g", "h"]
+		numbers = ["1", "2", "3", "4", "5", "6", "7", "8"]
+		if (letters.include? string[0]) && (letters.include? string[2]) && (numbers.include? string[1]) && (numbers.include? string[3])
+			start = Array.new
+			dest = Array.new
+			start << letters.index(string[0])
+			start << numbers.index(string[1])
+			dest << letters.index(string[2])
+			dest << numbers.index(string[3])
+			if piece_here?(start) == true
+				if ["♚", "♛", "♝", "♞", "♜", "♟"].include? piece(start).color
+					if piece(start).moves.include? dest
+						piece(start).position = [8, 2]
+						$all.each {|x| x.set_spot}
+						if $game.w_check? == true
+							piece([8, 2]).position = start
+							$all.each {|x| x.set_spot}
+							system "clear"
+							puts "ERROR!!!! This would put your king in check!!!"
+							white_turn
+						else
+							if piece_here?(dest)
+								piece(dest).capture
+							end
+							piece([8, 2]).position = dest
+							$all.each {|x| x.set_spot}
+							if ["♜", "♚"].include? piece(dest).color
+								piece(dest).moved = true
+							end
+							system "clear"
+							puts "Piece moved"
+						end
+
+						if $game.checkmate? == true
+							system "clear"
+							puts "White has checkmated black!"
+							$game.show_board
+							exit
+						end
+					else
+						system "clear"
+						puts "Your destination was not valid!"
+						white_turn
+					end
+				else
+					system "clear"
+					puts "You can't move your enemy's piece!"
+					white_turn
+				end
+			else
+				system "clear"
+				puts "There's nothing at your start point!"
+				white_turn
+			end
+		else
+			system "clear"
+			puts "ERROR!!! Wrong format!"
+			white_turn
+		end
+	else
+		system "clear"
+		puts "ERROR!!! Please put it in the correct format. (O-O-O or O-O for castling)"
+		white_turn
+	end
+end
+
+def black_turn
+	$game.show_board
+	puts "It's black's turn, please input your move in the letter-number format i.e e7e6."
+	if $game.b_check? == true
+		puts "You are in check!"
+	end
+	print "Your move:"
+	string = gets.chomp
+	if string == "O-O"
+		$game.castle("black", "right")
+	elsif string == "O-O-O"
+		$game.castle("black", "left")
+	elsif string.length == 4
+		letters = ["a", "b", "c", "d", "e", "f", "g", "h"]
+		numbers = ["1", "2", "3", "4", "5", "6", "7", "8"]
+		if (letters.include? string[0]) && (letters.include? string[2]) && (numbers.include? string[1]) && (numbers.include? string[3])
+			start = Array.new
+			dest = Array.new
+			start << letters.index(string[0])
+			start << numbers.index(string[1])
+			dest << letters.index(string[2])
+			dest << numbers.index(string[3])
+			if piece_here?(start) == true
+				if ["♔", "♕", "♗", "♘", "♖", "♙"].include? piece(start).color
+					if piece(start).moves.include? dest
+						piece(start).position = [8, 2]
+						$all.each {|x| x.set_spot}
+						if $game.w_check? == true
+							piece([8, 2]).position = start
+							$all.each {|x| x.set_spot}
+
+							system "clear"
+							puts "ERROR!!!! This would put your king in check!!!"
+							black_turn
+						else
+							if piece_here?(dest)
+								piece(dest).capture
+							end
+							piece([8, 2]).position = dest
+							$all.each {|x| x.set_spot}
+							if ["♖", "♔"].include? piece(dest).color
+								piece(dest).moved = true
+							end
+							system "clear"
+							puts "Piece moved"
+						end
+
+						if $game.checkmate? == true
+
+							system "clear"
+							puts "Black has checkmated white!"
+							$game.show_board
+							exit
+						end
+					else
+						system "clear"
+						puts "Your move was not valid!"
+						black_turn
+					end
+				else
+					system "clear"
+					puts "You can't move your enemy's piece!"
+					black_turn
+				end
+			else
+				system "clear"
+				puts "There's nothing at your start point!"
+				black_turn
+			end
+		else
+			system "clear"
+			puts "ERROR!!! Wrong format!"
+			black_turn
+		end
+	else
+		system "clear"
+		puts "ERROR!!! Please put it in the correct format. (O-O-O or O-O for castling)"
+		black_turn
+	end
+end
+
+new_game
+
+while 1
+	white_turn
+	black_turn
 end
